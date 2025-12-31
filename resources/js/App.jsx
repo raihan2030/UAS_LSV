@@ -1,63 +1,51 @@
+import ProductDetail from './ProductDetail'; // <--- Tambahkan ini
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, MessageCircle, Menu, X, Phone, Instagram, MapPin, Scissors, Star, ArrowRight } from 'lucide-react';
+import { ShoppingBag, MessageCircle, Menu, X, Phone, Instagram, MapPin, Scissors, Star, ArrowRight, Eye } from 'lucide-react';
 
 // --- KONFIGURASI WARNA & DATA ---
 // Primary: teal-600 (#0d9488) -> Air Sungai Martapura
 // Secondary: amber-600 (#d97706) -> Aksen Emas/Mewah
 // Background: stone-50 (#fafaf9) -> Putih Gading
 
-const PHONE_NUMBER = "6281234567890"; // Ganti dengan nomor WA Penjual
+const PHONE_NUMBER = "628125110790";
 
 // Mock Data (Nantinya ini yang diambil dari Backend Docker kamu)
-const INITIAL_PRODUCTS = [
-  {
-    id: 1,
-    name: "Sasirangan Motif Gigi Haruan",
-    price: 150000,
-    category: "Kain",
-    description: "Motif klasik yang melambangkan ketajaman berpikir. Bahan katun satin premium.",
-    image: "https://placehold.co/600x400/0d9488/ffffff?text=Gigi+Haruan" 
-  },
-  {
-    id: 2,
-    name: "Sasirangan Hiris Gagatas",
-    price: 175000,
-    category: "Kain",
-    description: "Warna merah marun kombinasi kuning. Cocok untuk acara formal.",
-    image: "https://placehold.co/600x400/9f1239/ffffff?text=Hiris+Gagatas"
-  },
-  {
-    id: 3,
-    name: "Kemeja Pria Sasirangan",
-    price: 250000,
-    category: "Pakaian Jadi",
-    description: "Kemeja siap pakai, ukuran L. Motif modern kombinasi.",
-    image: "https://placehold.co/600x400/1e293b/ffffff?text=Kemeja+Pria"
-  },
-  {
-    id: 4,
-    name: "Selendang Sasirangan Sutra",
-    price: 300000,
-    category: "Aksesoris",
-    description: "Bahan sutra asli, sangat lembut dan mewah. Pewarnaan alami.",
-    image: "https://placehold.co/600x400/d97706/ffffff?text=Selendang+Sutra"
-  }
-];
+// Mock Data Diperbarui (15 Produk)
+const INITIAL_PRODUCTS = [];
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [products, setProducts] = useState([]);
+  // State baru untuk menyimpan ID produk yang sedang dilihat
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
-  // --- SIMULASI KONEKSI KE BACKEND DOCKER ---
-  // Di sini nanti kamu bisa fetch data dari API Docker kamu
+  // FETCH DATA DARI API LARAVEL
   useEffect(() => {
-    // Contoh implementasi nanti:
-    // fetch('http://localhost:8080/api/products')
-    //   .then(res => res.json())
-    //   .then(data => setProducts(data))
-    //   .catch(err => console.error("Gagal ambil data dari Docker backend:", err));
-    
-    console.log("Frontend siap. Menunggu integrasi backend Docker...");
+    const fetchProducts = async () => {
+      try {
+        console.log("Mengambil data dari API...");
+        
+        // Panggil endpoint yang sudah Anda tes tadi
+        const response = await fetch('/api/products'); 
+        
+        // Cek jika response tidak oke (misal error 500 atau 404)
+        if (!response.ok) {
+            throw new Error('Gagal mengambil data dari server');
+        }
+
+        // Ubah data JSON dari server menjadi objek JavaScript
+        const data = await response.json();
+        
+        // Simpan data ke state React agar tampil di layar
+        setProducts(data);
+        console.log("Data berhasil dimuat:", data);
+
+      } catch (error) {
+        console.error("Terjadi kesalahan:", error);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const handleWhatsAppOrder = (productName) => {
@@ -71,6 +59,15 @@ export default function App() {
     const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
+
+  if (selectedProductId) {
+    return (
+        <ProductDetail 
+            productId={selectedProductId} 
+            onBack={() => setSelectedProductId(null)} 
+        />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-stone-800">
@@ -86,7 +83,7 @@ export default function App() {
                 <Scissors className="h-6 w-6 text-teal-700" />
               </div>
               <span className="text-stone-50 font-bold text-2xl tracking-wider">
-                BORNEO<span className="text-amber-400">WARNA</span>
+                BELLA<span className="text-amber-400">SASIRANGAN</span>
               </span>
             </div>
 
@@ -203,6 +200,8 @@ export default function App() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {products.map((product) => (
               <div key={product.id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden border border-stone-200 flex flex-col">
+                
+                {/* --- Bagian Gambar --- */}
                 <div className="relative h-64 overflow-hidden group">
                   <img 
                     src={product.image} 
@@ -213,6 +212,8 @@ export default function App() {
                     {product.category}
                   </div>
                 </div>
+
+                {/* --- Bagian Info & Tombol --- */}
                 <div className="p-6 flex-1 flex flex-col">
                   <h3 className="text-lg font-bold text-stone-800 mb-2 line-clamp-1">
                     {product.name}
@@ -220,18 +221,33 @@ export default function App() {
                   <p className="text-sm text-stone-500 mb-4 line-clamp-2 flex-1">
                     {product.description}
                   </p>
+                  
+                  {/* Harga */}
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-stone-100">
                     <span className="text-xl font-bold text-teal-700">
-                      Rp {product.price.toLocaleString('id-ID')}
+                      Rp {Number(product.price).toLocaleString('id-ID')}
                     </span>
                   </div>
-                  <button 
-                    onClick={() => handleWhatsAppOrder(product.name)}
-                    className="w-full mt-4 bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700 transition flex items-center justify-center gap-2 font-medium"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    Pesan via WA
-                  </button>
+
+                  {/* --- DUA TOMBOL BARU DISINI --- */}
+                  <div className="flex gap-2 mt-4">
+                    {/* Tombol Detail */}
+                    <button 
+                      onClick={() => setSelectedProductId(product.id)}
+                      className="flex-1 bg-stone-200 text-stone-700 py-2 px-4 rounded-lg hover:bg-stone-300 transition flex items-center justify-center gap-2 font-bold text-sm"
+                    >
+                      <Eye className="w-4 h-4" /> Detail
+                    </button>
+
+                    {/* Tombol Beli (WA) */}
+                    <button 
+                      onClick={() => handleWhatsAppOrder(product.name)}
+                      className="flex-1 bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700 transition flex items-center justify-center gap-2 font-bold text-sm"
+                    >
+                      <ShoppingBag className="w-4 h-4" /> Beli
+                    </button>
+                  </div>
+
                 </div>
               </div>
             ))}
@@ -291,9 +307,10 @@ export default function App() {
                {/* Visual representation of custom work */}
                <div className="aspect-w-3 aspect-h-2 rounded-2xl bg-gradient-to-tr from-teal-800 to-stone-800 p-8 flex items-center justify-center border border-stone-700 shadow-2xl">
                   <div className="text-center">
-                    <Scissors className="w-20 h-20 text-stone-500 mx-auto mb-4" />
+                    <img className="rounded-2xl" src="/images/custom-order.jpeg" alt="" />
+                    {/* <Scissors className="w-20 h-20 text-stone-500 mx-auto mb-4" />
                     <p className="text-stone-400 font-mono text-sm">Custom Work Area</p>
-                    <p className="text-stone-500 text-xs mt-2">Dyeing & Patterning Process</p>
+                    <p className="text-stone-500 text-xs mt-2">Dyeing & Patterning Process</p> */}
                   </div>
                </div>
             </div>
@@ -311,7 +328,7 @@ export default function App() {
                <div className="flex items-center space-x-2 mb-4">
                 <Scissors className="h-6 w-6 text-teal-700" />
                 <span className="text-stone-900 font-bold text-xl">
-                  BORNEO<span className="text-amber-600">WARNA</span>
+                  BELLA<span className="text-amber-600">SASIRANGAN</span>
                 </span>
               </div>
               <p className="text-stone-500 text-sm">
@@ -335,11 +352,11 @@ export default function App() {
               <ul className="space-y-2 text-stone-600 text-sm">
                 <li className="flex items-center">
                   <Phone className="w-4 h-4 mr-2 text-teal-600" />
-                  +62 812 3456 7890
+                  +62 812 5110 790
                 </li>
                 <li className="flex items-center">
                   <Instagram className="w-4 h-4 mr-2 text-teal-600" />
-                  @borneowarna.sasirangan
+                  @bella.sasirangan
                 </li>
                 <li className="flex items-center">
                   <MapPin className="w-4 h-4 mr-2 text-teal-600" />
@@ -359,7 +376,7 @@ export default function App() {
           </div>
 
           <div className="border-t border-stone-200 pt-8 text-center text-stone-400 text-sm">
-            <p>&copy; {new Date().getFullYear()} Borneo Warna Sasirangan. Tugas Layanan Sistem Virtual.</p>
+            <p>&copy; {new Date().getFullYear()} Bella Sasirangan.</p>
           </div>
         </div>
       </footer>
