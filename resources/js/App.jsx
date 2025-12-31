@@ -7,7 +7,7 @@ import { ShoppingBag, MessageCircle, Menu, X, Phone, Instagram, MapPin, Scissors
 // Secondary: amber-600 (#d97706) -> Aksen Emas/Mewah
 // Background: stone-50 (#fafaf9) -> Putih Gading
 
-const PHONE_NUMBER = "628125110790";
+const PHONE_NUMBER = "6285389825957";
 
 // Mock Data (Nantinya ini yang diambil dari Backend Docker kamu)
 // Mock Data Diperbarui (15 Produk)
@@ -352,7 +352,7 @@ export default function App() {
               <ul className="space-y-2 text-stone-600 text-sm">
                 <li className="flex items-center">
                   <Phone className="w-4 h-4 mr-2 text-teal-600" />
-                  +62 812 5110 790
+                  +62 853 8982 5957
                 </li>
                 <li className="flex items-center">
                   <Instagram className="w-4 h-4 mr-2 text-teal-600" />
