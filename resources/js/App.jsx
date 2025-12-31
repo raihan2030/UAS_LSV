@@ -9,10 +9,6 @@ import { ShoppingBag, MessageCircle, Menu, X, Phone, Instagram, MapPin, Scissors
 
 const PHONE_NUMBER = "6285389825957";
 
-// Mock Data (Nantinya ini yang diambil dari Backend Docker kamu)
-// Mock Data Diperbarui (15 Produk)
-const INITIAL_PRODUCTS = [];
-
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [products, setProducts] = useState([]);
@@ -368,8 +364,17 @@ export default function App() {
             {/* Maps / Additional Info */}
             <div>
               <h4 className="font-bold text-stone-900 mb-4">Lokasi</h4>
-              <div className="w-full h-32 bg-stone-200 rounded-lg flex items-center justify-center text-stone-500 text-xs">
-                [Google Maps Placeholder]
+              <div className="w-full h-64 bg-stone-200 rounded-lg overflow-hidden shadow-md">
+                 <iframe 
+                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3982.8960421718425!2d114.6472592!3d-3.3755800000000007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2de4272ea579d837%3A0x36f9650dc4f2c914!2sBella%20Sasirangan!5e0!3m2!1sid!2sid!4v1767186807636!5m2!1sid!2sid" 
+                   width="100%" 
+                   height="100%" 
+                   style={{ border: 0 }} 
+                   allowFullScreen="" 
+                   loading="lazy" 
+                   referrerPolicy="no-referrer-when-downgrade"
+                   title="Google Maps Lokasi Toko"
+                 ></iframe>
               </div>
             </div>
 
